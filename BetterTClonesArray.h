@@ -62,12 +62,18 @@ public:
   BetterTClonesArray(BetterTClonesArray const &other) : mBare(other.mBare) {}
 
   iterator begin() const { return iterator(0, mBare); }
-  iterator end() const { return iterator(mBare->LastIndex() + 1, mBare); }
+  iterator end() const { return iterator(mBare->GetLast() + 1, mBare); }
 
-  // A type safe operator[]
+  // A type safe operator[] to read elements
   // We could make a fast version of this (without checks realocation etc.)
   // by directly accessing the internal data of mBare
-  T operator[](size_t i) const { return static_cast<T>(mBare->operator[](i)); }
+  T operator[](size_t i) const {
+    // assert();
+    return static_cast<T>(mBare->operator[](i));
+  }
+
+  // ConstructedAt interface
+
 
   // Do we want an l-value operator[]
 
@@ -80,6 +86,8 @@ public:
 
   // should we allow implicit castings to TClonesArray (or prefer raw())??
   operator TClonesArray*() const { return mBare; }
+
+  // Ideas: offer reasonable push_back, emplace_back, size functionality
 
 private:
   TClonesArray *mBare;

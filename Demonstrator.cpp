@@ -39,8 +39,12 @@ int main() {
   TClonesArray *a = new TClonesArray("Point",100);
   // init actual objects with placement new
   for(int i=0;i<50;++i){
-    new((*a)[i]) Point;
+    if (i!=30) new((*a)[i]) Point;
   }
+
+  std::cerr << " " << a->GetSize() << "\n";
+  std::cerr << " " << a->GetEntries() << "\n";
+  std::cerr << " " << a->GetLast() << "\n";
 
   consumerhook(*a);
 
