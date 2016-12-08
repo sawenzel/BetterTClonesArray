@@ -35,6 +35,12 @@ void testAssignment() {
   callInterface(n);
 }
 
+void testConstruction(BetterTClonesArray<Point *> array) {
+  auto p = array.ConstructedAt(30);
+  p->foo();
+}
+
+
 int main() {
   TClonesArray *a = new TClonesArray("Point",100);
   // init actual objects with placement new
@@ -45,10 +51,18 @@ int main() {
   std::cerr << " " << a->GetSize() << "\n";
   std::cerr << " " << a->GetEntries() << "\n";
   std::cerr << " " << a->GetLast() << "\n";
+  std::cerr << " " << a->At(30) << "\n";
+  std::cerr << " " << a->UncheckedAt(30) << "\n";
+  std::cerr << " " << const_cast<TClonesArray const *>(a)->operator [](30) << "\n";
+  std::cerr << " " << a->At(30) << "\n";
+  std::cerr << " " << a->UncheckedAt(30) << "\n";
+
 
   consumerhook(*a);
 
   testAssignment();
+  testConstruction(*a);
+  std::cerr << " " << a->UncheckedAt(30) << "\n";
 
   return 0;
 }

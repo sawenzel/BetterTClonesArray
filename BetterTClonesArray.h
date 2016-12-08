@@ -74,14 +74,13 @@ public:
   }
 
   // we delete this function: It is evil !!
+  // This also means we will dissallow placemenent news in favour of ConstructedAt
   T& operator[](size_t) = delete;
 
-
-  // Offer only
-  // ConstructedAt interface
-
-
-  // Do we want an l-value operator[]
+  // construct object in place at slot i or return existing object
+  T ConstructedAt(size_t i) {
+    return static_cast<T>(mBare->ConstructedAt(i));
+  }
 
   // we can provide here the better and fast sorting:
   // void Sort();
