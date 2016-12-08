@@ -1,7 +1,10 @@
 #include "TClonesArray.h"
 #include <type_traits>
 
-template <typename T> class BetterTClonesArray : public TClonesArray {
+
+// A smart and type-safe wrapper around TClonesArray
+// In some sense, it has some similarities to smart pointers ...
+template <typename T> class BetterTClonesArray /*: public TClonesArray */ {
     // need to impose that T is a pointer type (as is the case for TClonesArray)
     static_assert(std::is_pointer<T>::value,
                 "template argument of BetterTClonesArray needs to be pointer");
@@ -52,6 +55,11 @@ template <typename T> class BetterTClonesArray : public TClonesArray {
 public:
   // implicit constructor
   BetterTClonesArray(TClonesArray &p) : mBare(&p) {}
+  BetterTClonesArray(TClonesArray *ptr) : mBare(ptr) {}
+
+  // assignment operator from a TClonesArray pointer
+  BetterTClonesArray operator=(TClonesArray *ptr) { mBare = ptr; }
+  BetterTClonesArray(BetterTClonesArray const &other) : mBare(other.mBare) {}
 
   iterator begin() const { return iterator(0, mBare); }
   iterator end() const { return iterator(mBare->LastIndex() + 1, mBare); }
@@ -61,7 +69,17 @@ public:
   // by directly accessing the internal data of mBare
   T operator[](size_t i) const { return static_cast<T>(mBare->operator[](i)); }
 
+  // Do we want an l-value operator[]
+
   // we can provide here the better and fast sorting:
+  // void Sort();
+
+  // access to the raw container
+  TClonesArray *raw() { return mBare; }
+  TClonesArray const *raw() const { return mBare; }
+
+  // should we allow implicit castings to TClonesArray (or prefer raw())??
+  operator TClonesArray*() const { return mBare; }
 
 private:
   TClonesArray *mBare;
