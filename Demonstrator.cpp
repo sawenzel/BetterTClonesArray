@@ -38,6 +38,10 @@ void testAssignment() {
 void testConstruction(BetterTClonesArray<Point *> array) {
   auto p = array.ConstructedAt(30);
   p->foo();
+
+  // Note that the following version no longer compiles
+  // thanks to deleted operator[]
+  // new (array[30]) Point();
 }
 
 
