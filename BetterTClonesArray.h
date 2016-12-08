@@ -36,13 +36,15 @@ template <typename T> class BetterTClonesArray /*: public TClonesArray */ {
     // we could make this clever by actually jumping to the next VALID object
     // for the moment just going to next location
     iterator &operator++() {
-      mIndex++;
+      do {
+        mIndex++;
+      } while ( mArray->UncheckedAt(mIndex) == nullptr && mIndex < mArray->GetLast()-1 );
       return *this;
     }
 
     // dereferencing the iterator:
     pointer operator*() const {
-      return static_cast<T>(mArray->operator[](mIndex));
+      return static_cast<T>(mArray->UncheckedAt(mIndex));
     }
     // reference operator->() const;
 
@@ -68,10 +70,14 @@ public:
   // We could make a fast version of this (without checks realocation etc.)
   // by directly accessing the internal data of mBare
   T operator[](size_t i) const {
-    // assert();
-    return static_cast<T>(mBare->operator[](i));
+    return static_cast<T>(mBare->UncheckedAt(i));
   }
 
+  // we delete this function: It is evil !!
+  T& operator[](size_t) = delete;
+
+
+  // Offer only
   // ConstructedAt interface
 
 
