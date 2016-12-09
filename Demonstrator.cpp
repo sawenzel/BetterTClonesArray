@@ -45,6 +45,11 @@ void testConstruction(BetterTClonesArray<Point *> array) {
 }
 
 
+void testRealConstruction() {
+  // construct an array with 100 slots
+  BetterTClonesArray<Point *> constructed(100);
+}
+
 int main() {
   TClonesArray *a = new TClonesArray("Point",100);
   // init actual objects with placement new
@@ -67,6 +72,8 @@ int main() {
   testAssignment();
   testConstruction(*a);
   std::cerr << " " << a->UncheckedAt(30) << "\n";
+
+  testRealConstruction();
 
   return 0;
 }

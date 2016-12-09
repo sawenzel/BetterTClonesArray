@@ -15,6 +15,8 @@ template <typename T> class BetterTClonesArray /*: public TClonesArray */ {
   static_assert(std::is_base_of<TObject, typename std::remove_pointer<T>::type>::value,
                 "template argument of BetterTClonesArray needs to inherit from TObject");
 
+  using nopointerT = typename std::remove_pointer<T>::type;
+
   // internal iterator class
   // http://stackoverflow.com/questions/7758580/writing-your-own-stl-container/7759622#7759622
   class iterator {
@@ -64,6 +66,11 @@ public:
   // implicit constructor
   BetterTClonesArray(TClonesArray &p) : mBare(&p) {}
   BetterTClonesArray(TClonesArray *ptr) : mBare(ptr) {}
+
+  // explicit construction (so that user never has to say TClonesArray)
+  BetterTClonesArray(size_t size) : mBare(new TClonesArray(nopointerT::Class())) {
+
+  }
 
   // assignment operator from a TClonesArray pointer
   BetterTClonesArray operator=(TClonesArray *ptr) { mBare = ptr; }
