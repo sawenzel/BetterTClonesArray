@@ -1,13 +1,19 @@
+#pragma once
 #include "TClonesArray.h"
+#include "TObject.h"
 #include <type_traits>
 
 
 // A smart and type-safe wrapper around TClonesArray
 // In some sense, it has some similarities to smart pointers ...
 template <typename T> class BetterTClonesArray /*: public TClonesArray */ {
-    // need to impose that T is a pointer type (as is the case for TClonesArray)
-    static_assert(std::is_pointer<T>::value,
+  // need to impose that T is a pointer type (as is the case for TClonesArray)
+  static_assert(std::is_pointer<T>::value,
                 "template argument of BetterTClonesArray needs to be pointer");
+
+  // imposing that T is derived from ROOT TObject class
+  static_assert(std::is_base_of<TObject, typename std::remove_pointer<T>::type>::value,
+                "template argument of BetterTClonesArray needs to inherit from TObject");
 
   // internal iterator class
   // http://stackoverflow.com/questions/7758580/writing-your-own-stl-container/7759622#7759622
@@ -92,7 +98,7 @@ public:
   // should we allow implicit castings to TClonesArray (or prefer raw())??
   operator TClonesArray*() const { return mBare; }
 
-  // Ideas: offer reasonable push_back, emplace_back, size functionality
+  // Ideas: offer reasonable push_back, emplace_back
 
 private:
   TClonesArray *mBare;
