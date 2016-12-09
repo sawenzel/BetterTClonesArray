@@ -2,6 +2,7 @@
 #include "TClonesArray.h"
 #include "TObject.h"
 #include <type_traits>
+#include <cassert>
 
 
 // A smart and type-safe wrapper around TClonesArray
@@ -41,8 +42,7 @@ template <typename T> class BetterTClonesArray /*: public TClonesArray */ {
       return mArray != other.mArray || mIndex != other.mIndex;
     }
 
-    // we could make this clever by actually jumping to the next VALID object
-    // for the moment just going to next location
+    // neglecting empty slots
     iterator &operator++() {
       do {
         mIndex++;
@@ -64,8 +64,12 @@ template <typename T> class BetterTClonesArray /*: public TClonesArray */ {
 
 public:
   // implicit constructor
-  BetterTClonesArray(TClonesArray &p) : mBare(&p) {}
-  BetterTClonesArray(TClonesArray *ptr) : mBare(ptr) {}
+  BetterTClonesArray(TClonesArray &p) : mBare(&p) {
+    assert(nopointerT::Class() == p.GetClass());
+  }
+  BetterTClonesArray(TClonesArray *ptr) : mBare(ptr) {
+    assert(nopointerT::Class() == ptr->GetClass());
+  }
 
   // explicit construction (so that user never has to say TClonesArray)
   BetterTClonesArray(size_t size) : mBare(new TClonesArray(nopointerT::Class())) {
@@ -73,7 +77,11 @@ public:
   }
 
   // assignment operator from a TClonesArray pointer
-  BetterTClonesArray operator=(TClonesArray *ptr) { mBare = ptr; }
+  BetterTClonesArray operator=(TClonesArray *ptr) {
+    assert(nopointerT::Class() == ptr->GetClass());
+    mBare = ptr;
+  }
+
   BetterTClonesArray(BetterTClonesArray const &other) : mBare(other.mBare) {}
 
   iterator begin() const { return iterator(0, mBare); }
@@ -93,6 +101,11 @@ public:
   // construct object in place at slot i or return existing object
   T ConstructedAt(size_t i) {
     return static_cast<T>(mBare->ConstructedAt(i));
+  }
+
+  // returns if slot i in the array has been constructed with an object
+  bool IsSlotConstructed(size_t i) const {
+    return this->operator [](i) != nullptr;
   }
 
   // we can provide here the better and fast sorting:
